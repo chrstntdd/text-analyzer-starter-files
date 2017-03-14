@@ -3,38 +3,43 @@ function getTokens(rawString) {
   return rawString.toLowerCase().split(/[ ,!.";:-]+/).filter(Boolean).sort();
 }
 
-function getWordData (string) {
+function getWordData(string) {
   var words = getTokens(string);
-  var wordCount = words.length;
-
   var wordData = {};
-  for (let i =  0; i < words.length; i++){
-    if (words[i] in wordData){
+  var wordMetrics = {};
+
+  for (let i = 0; i < words.length; i++) {
+    if (words[i] in wordData) {
       wordData[words[i]]++;
     } else {
       wordData[words[i]] = 1;
     }
   }
 
-  var wordLengthArr = []; //init
+  wordMetrics.count = (function (words) {
+    return getTokens(string).length;
+  })();
 
-  for(let i = 0; i < words.length; i++){
-    wordLengthArr.push(words[i].length);
-  }
-  var wordLengthAvg = (wordLengthArr.reduce((a,b) => a + b, 0) / wordCount).toFixed(2);
-
-  var uniqueWordCount = 0; //init
-  
-  for (var word in wordData){
-    if (wordData[word] == 1){
-      uniqueWordCount++;
+  wordMetrics.avgWordLength = (function () {
+    wordLengthArr = [];
+    for (let i = 0; i < words.length; i++) {
+      wordLengthArr.push(words[i].length);
     }
-  }
-  console.log(wordCount);
-  console.log(uniqueWordCount);
-  console.log(wordLengthAvg);
-  
+    return Number((wordLengthArr.reduce((a, b) => a + b, 0) / wordMetrics.count).toFixed(2));
+  })();
+
+  wordMetrics.uniqueWordCount = (function () {
+    var uniqueWordCount = 0;
+    for (var word in wordData) {
+      if (wordData[word] == 1) {
+        uniqueWordCount++;
+      }
+    }
+    return uniqueWordCount;
+  })();
+
+  //console.log(wordMetrics);
+  return wordMetrics;
 }
 
 getWordData('No surprise when youre on his shoulder like every night night fight bright night');
-
